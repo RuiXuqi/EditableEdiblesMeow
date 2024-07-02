@@ -11,6 +11,12 @@ public class FoodEffectEntry {
     private boolean cancelsDefault = false;
     private boolean alwaysEdible = false;
 
+    //MistyWorlds compat
+    private Pair<Integer, Float> intoxicationPair;
+
+    //MistyWorlds compat
+    private Pair<Integer, Float> pollutionPair;
+
     public Object2FloatOpenHashMap<PotionEffect> getEffectMap() {
         return this.effectMap;
     }
@@ -31,6 +37,16 @@ public class FoodEffectEntry {
         return this.alwaysEdible;
     }
 
+    //MistyWorlds compat
+    public Pair<Integer, Float> getIntoxicationPair() {
+        return this.intoxicationPair;
+    }
+
+    //MistyWorlds compat
+    public Pair<Integer, Float> getPollutionPair() {
+        return this.pollutionPair;
+    }
+
     public void addEffect(PotionEffect effect, float chance) {
         if(effect != null) this.effectMap.put(effect, Math.max(0.0F, Math.min(1.0F, chance)));
     }
@@ -49,6 +65,16 @@ public class FoodEffectEntry {
 
     public void setAlwaysEdible() {
         this.alwaysEdible = true;
+    }
+
+    //MistyWorlds compat
+    public void setIntoxicationPair(Integer left, Float right) {
+        this.intoxicationPair = new Pair<>(left, right);
+    }
+
+    //MistyWorlds compat
+    public void setPollutionPair(Integer left, Float right) {
+        this.pollutionPair = new Pair<>(left, right);
     }
 
     public enum CureType {

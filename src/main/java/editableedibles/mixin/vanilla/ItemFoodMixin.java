@@ -1,5 +1,6 @@
 package editableedibles.mixin.vanilla;
 
+import editableedibles.handlers.CompatHandler;
 import editableedibles.handlers.ForgeConfigHandler;
 import editableedibles.util.FoodEffectEntry;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
@@ -83,7 +84,9 @@ public abstract class ItemFoodMixin {
         if(world == null || world.isRemote || player == null) return;
         for(Map.Entry<PotionEffect, Float> eff : effectEntry.getEffectMap().entrySet()) {
             if(world.rand.nextFloat() < eff.getValue()) {
-                player.addPotionEffect(new PotionEffect(eff.getKey()));
+                PotionEffect effect = eff.getKey();
+                if(effect.getPotion().isInstant()) effect.getPotion().affectEntity(player, player, player, effect.getAmplifier(), 1.0D);
+                else player.addPotionEffect(new PotionEffect(effect));
             }
         }
         for(Map.Entry<PotionEffect, Float> cure : effectEntry.getCureEffectMap().entrySet()) {
@@ -121,5 +124,6 @@ public abstract class ItemFoodMixin {
                 }
             }
         }
+        CompatHandler.handleCompatEffectEntry(effectEntry, world, player);
     }
 }

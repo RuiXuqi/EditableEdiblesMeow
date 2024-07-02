@@ -19,11 +19,15 @@ import org.apache.logging.log4j.Level;
 @Config(modid = EditableEdibles.MODID)
 public class ForgeConfigHandler {
 
-	private static Object2ObjectArrayMap<Item, Int2ObjectArrayMap<FoodEffectEntry>> foodEffectMap;
+	private static Object2ObjectArrayMap<Item, Int2ObjectArrayMap<FoodEffectEntry>> foodEffectMap = null;
 	
 	@Config.Comment("Server-Side Options")
 	@Config.Name("Server Options")
 	public static final ServerConfig server = new ServerConfig();
+
+	@Config.Comment("Mod Compat Options")
+	@Config.Name("Compat Options")
+	public static final CompatConfig compat = new CompatConfig();
 
 	public static class ServerConfig {
 
@@ -73,6 +77,27 @@ public class ForgeConfigHandler {
 		public boolean overrideAlwaysEdible = false;
 	}
 
+	public static class CompatConfig {
+
+		@Config.Comment("List of food items with value to be added to intoxication and the chance to add it \n" +
+				"Intoxication is between 0 and 10000, values added can be negative \n" +
+				"Format: String itemid, Int metadata (-1 for any), Int intoxicationAddValue, Float chance \n" +
+				"Example: minecraft:poisonous_potato, -1, -2000, 0.75")
+		@Config.Name("MistyWorld Food Intoxication and Chances")
+		public String[] mistyWorldFoodIntox = {
+
+		};
+
+		@Config.Comment("List of food items with value to be added to pollution and the chance to add it \n" +
+				"Pollution is between 0 and 10000, values added can be negative \n" +
+				"Format: String itemid, Int metadata (-1 for any), Int pollutionAddValue, Float chance \n" +
+				"Example: minecraft:apple, -1, 1000, 0.5")
+		@Config.Name("MistyWorld Food Pollution and Chances")
+		public String[] mistyWorldFoodPollu = {
+
+		};
+	}
+
 	public static Object2ObjectArrayMap<Item, Int2ObjectArrayMap<FoodEffectEntry>> getFoodEffectMap() {
 		if(ForgeConfigHandler.foodEffectMap == null) parseItemEntries();
 		return ForgeConfigHandler.foodEffectMap;
@@ -85,6 +110,7 @@ public class ForgeConfigHandler {
 		parseFoodCureEffectArray();
 		parseFoodCureTypeArray();
 		parseAlwaysEdiblerray();
+		parseMistyWorldCompatArray();
 	}
 
 	private static void parseFoodEffectArray() {
@@ -218,6 +244,53 @@ public class ForgeConfigHandler {
 			}
 			catch(Exception ex) {
 				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse always edible entry: " + string);
+			}
+		}
+	}
+
+	private static void parseMistyWorldCompatArray() {
+		for(String string : ForgeConfigHandler.compat.mistyWorldFoodIntox) {
+			try {
+				String[] arr = string.split(",");
+				Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(arr[0].trim()));
+				int meta = Integer.parseInt(arr[1].trim());
+				int addValue = Integer.parseInt(arr[2].trim());
+				float chance = Float.parseFloat(arr[3].trim());
+
+				Int2ObjectArrayMap<FoodEffectEntry> metaMap = foodEffectMap.get(item);
+				if(metaMap == null) metaMap = new Int2ObjectArrayMap<>();
+
+				FoodEffectEntry entry = metaMap.get(meta);
+				if(entry == null) entry = new FoodEffectEntry();
+
+				entry.setIntoxicationPair(addValue, chance);
+				metaMap.put(meta, entry);
+				foodEffectMap.put(item, metaMap);
+			}
+			catch(Exception ex) {
+				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse misty world intoxication entry: " + string);
+			}
+		}
+		for(String string : ForgeConfigHandler.compat.mistyWorldFoodPollu) {
+			try {
+				String[] arr = string.split(",");
+				Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(arr[0].trim()));
+				int meta = Integer.parseInt(arr[1].trim());
+				int addValue = Integer.parseInt(arr[2].trim());
+				float chance = Float.parseFloat(arr[3].trim());
+
+				Int2ObjectArrayMap<FoodEffectEntry> metaMap = foodEffectMap.get(item);
+				if(metaMap == null) metaMap = new Int2ObjectArrayMap<>();
+
+				FoodEffectEntry entry = metaMap.get(meta);
+				if(entry == null) entry = new FoodEffectEntry();
+
+				entry.setPollutionPair(addValue, chance);
+				metaMap.put(meta, entry);
+				foodEffectMap.put(item, metaMap);
+			}
+			catch(Exception ex) {
+				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse misty world pollution entry: " + string);
 			}
 		}
 	}
