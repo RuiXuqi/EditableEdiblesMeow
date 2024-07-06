@@ -268,7 +268,7 @@ public class ForgeConfigHandler {
 				foodEffectMap.put(item, metaMap);
 			}
 			catch(Exception ex) {
-				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse misty world intoxication entry: " + string);
+				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse MistyWorld intoxication entry: " + string);
 			}
 		}
 		for(String string : ForgeConfigHandler.compat.mistyWorldFoodPollu) {
@@ -290,7 +290,7 @@ public class ForgeConfigHandler {
 				foodEffectMap.put(item, metaMap);
 			}
 			catch(Exception ex) {
-				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse misty world pollution entry: " + string);
+				EditableEdibles.LOGGER.log(Level.WARN, "Failed to parse MistyWorld pollution entry: " + string);
 			}
 		}
 	}

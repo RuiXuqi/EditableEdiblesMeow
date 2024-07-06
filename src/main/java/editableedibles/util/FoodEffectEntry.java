@@ -12,10 +12,10 @@ public class FoodEffectEntry {
     private boolean alwaysEdible = false;
 
     //MistyWorlds compat
-    private Pair<Integer, Float> intoxicationPair;
+    private Pair<Integer, Float> intoxicationPair = null;
 
     //MistyWorlds compat
-    private Pair<Integer, Float> pollutionPair;
+    private Pair<Integer, Float> pollutionPair = null;
 
     public Object2FloatOpenHashMap<PotionEffect> getEffectMap() {
         return this.effectMap;

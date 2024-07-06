@@ -1,6 +1,8 @@
 package editableedibles;
 
 import java.util.Map;
+
+import editableedibles.handlers.CompatHandler;
 import fermiumbooter.FermiumRegistryAPI;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -11,7 +13,8 @@ public class EditableEdiblesPlugin implements IFMLLoadingPlugin {
 
 	public EditableEdiblesPlugin() {
 		MixinBootstrap.init();
-		FermiumRegistryAPI.enqueueMixin(false, "mixins.editableedibles.json");
+		FermiumRegistryAPI.enqueueMixin(false, "mixins.editableedibles.vanilla.json");
+		FermiumRegistryAPI.enqueueMixin(true, "mixins.editableedibles.foodexpansion.json", CompatHandler::isFoodExpansionLoaded);
 	}
 
 	@Override
