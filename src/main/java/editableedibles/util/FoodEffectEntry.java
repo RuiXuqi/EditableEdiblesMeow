@@ -1,11 +1,12 @@
 package editableedibles.util;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.potion.PotionEffect;
 
 public class FoodEffectEntry {
 
-    private final Object2FloatOpenHashMap<PotionEffect> effectMap = new Object2FloatOpenHashMap<>();
+    private final Object2ObjectOpenHashMap<PotionEffect, EffectEntry> effectMap = new Object2ObjectOpenHashMap<>();
     private final Object2FloatOpenHashMap<PotionEffect> cureEffectMap = new Object2FloatOpenHashMap<>();
     private final Object2FloatOpenHashMap<CureType> cureTypeMap = new Object2FloatOpenHashMap<>();
     private boolean cancelsDefault = false;
@@ -17,7 +18,7 @@ public class FoodEffectEntry {
     //MistyWorlds compat
     private Pair<Integer, Float> pollutionPair = null;
 
-    public Object2FloatOpenHashMap<PotionEffect> getEffectMap() {
+    public Object2ObjectOpenHashMap<PotionEffect, EffectEntry> getEffectMap() {
         return this.effectMap;
     }
 
@@ -47,8 +48,8 @@ public class FoodEffectEntry {
         return this.pollutionPair;
     }
 
-    public void addEffect(PotionEffect effect, float chance) {
-        if(effect != null) this.effectMap.put(effect, Math.max(0.0F, Math.min(1.0F, chance)));
+    public void addEffect(PotionEffect effect, float chance, boolean additiveDuration, int maxDuration, boolean additiveAmplifier, int maxAmplifier) {
+        if(effect != null) this.effectMap.put(effect, new EffectEntry(Math.max(0.0F, Math.min(1.0F, chance)), additiveDuration, maxDuration, additiveAmplifier, maxAmplifier));
     }
 
     public void addCureEffect(PotionEffect effect, float chance) {
@@ -81,5 +82,42 @@ public class FoodEffectEntry {
         ALL,
         POSITIVE,
         NEGATIVE
+    }
+    
+    public static class EffectEntry {
+        
+        private final float chance;
+        private final boolean additiveDuration;
+        private final int maxDuration;
+        private final boolean additiveAmplifier;
+        private final int maxAmplifier;
+        
+        public EffectEntry(float chance, boolean additiveDuration, int maxDuration, boolean additiveAmplifier, int maxAmplifier) {
+            this.chance = chance;
+            this.additiveDuration = additiveDuration;
+            this.maxDuration = maxDuration;
+            this.additiveAmplifier = additiveAmplifier;
+            this.maxAmplifier = maxAmplifier;
+        }
+        
+        public float getChance() {
+            return this.chance;
+        }
+        
+        public boolean getAdditiveDuration() {
+            return this.additiveDuration;
+        }
+        
+        public int getMaxDuration() {
+            return this.maxDuration;
+        }
+        
+        public boolean getAdditiveAmplifier() {
+            return this.additiveAmplifier;
+        }
+        
+        public int getMaxAmplifier() {
+            return this.maxAmplifier;
+        }
     }
 }

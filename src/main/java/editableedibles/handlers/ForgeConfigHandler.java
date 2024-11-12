@@ -34,7 +34,9 @@ public class ForgeConfigHandler {
 		@Config.Comment(
 				"List of food items with their effects and chance to be applied when eaten \n" +
 				"Format: String itemid, Int metadata (-1 for any), String potionid, Int duration, Int amplifier, Boolean showparticles, Float chance \n" +
-				"Example: minecraft:chicken, -1, minecraft:hunger, 120, 0, false, 0.25")
+				"Optional Additional Args, allows for modifying application rules of custom effects: Boolean additiveDuration, Int maxDuration (-1 for any), Boolean additiveAmplifier, Int maxAmplifier (-1 for any)\n" +
+				"Example: minecraft:chicken, -1, minecraft:hunger, 120, 0, false, 0.25 \n" +
+				"Example (Additional): minecraft:steak, -1, minecraft:strength, 30, 0, false, 1.0, true, 120, false, -1")
 		@Config.Name("Food Effects and Chances")
 		public String[] foodEffectArray = {
 
@@ -128,6 +130,20 @@ public class ForgeConfigHandler {
 				int amplifier = Integer.parseInt(arr[4].trim());
 				boolean show = Boolean.parseBoolean(arr[5].trim());
 				float chance = Float.parseFloat(arr[6].trim());
+				
+				boolean additiveDuration = false;
+				int maxDuration = -1;
+				boolean additiveAmplifier = false;
+				int maxAmplifier = -1;
+				if(arr.length > 7) {
+					try {
+						additiveDuration = Boolean.parseBoolean(arr[7].trim());
+						maxDuration = Integer.parseInt(arr[8].trim());
+						additiveAmplifier = Boolean.parseBoolean(arr[9].trim());
+						maxAmplifier = Integer.parseInt(arr[10].trim());
+					}
+					catch(Exception ignored) {}
+				}
 
 				Int2ObjectArrayMap<FoodEffectEntry> metaMap = foodEffectMap.get(item);
 				if(metaMap == null) metaMap = new Int2ObjectArrayMap<>();
@@ -135,7 +151,7 @@ public class ForgeConfigHandler {
 				FoodEffectEntry entry = metaMap.get(meta);
 				if(entry == null) entry = new FoodEffectEntry();
 
-				entry.addEffect(new PotionEffect(potion, duration, amplifier, false, show), chance);
+				entry.addEffect(new PotionEffect(potion, duration, amplifier, false, show), chance, additiveDuration, maxDuration, additiveAmplifier, maxAmplifier);
 				metaMap.put(meta, entry);
 				foodEffectMap.put(item, metaMap);
 			}

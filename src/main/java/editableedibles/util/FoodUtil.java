@@ -12,11 +12,26 @@ public abstract class FoodUtil {
 
     public static void handleEffectEntry(FoodEffectEntry effectEntry, World world, EntityPlayer player) {
         if(world == null || world.isRemote || player == null) return;
-        for(Map.Entry<PotionEffect, Float> eff : effectEntry.getEffectMap().entrySet()) {
-            if(world.rand.nextFloat() < eff.getValue()) {
+        for(Map.Entry<PotionEffect, FoodEffectEntry.EffectEntry> eff : effectEntry.getEffectMap().entrySet()) {
+            if(world.rand.nextFloat() < eff.getValue().getChance()) {
                 PotionEffect effect = eff.getKey();
                 if(effect.getPotion().isInstant()) effect.getPotion().affectEntity(player, player, player, effect.getAmplifier(), 1.0D);
-                else player.addPotionEffect(new PotionEffect(effect));
+                else {
+                    int duration = effect.getDuration();
+                    int amplifier = effect.getAmplifier();
+                    if(eff.getValue().getAdditiveDuration() || eff.getValue().getAdditiveAmplifier()) {
+                        PotionEffect effectPrev = player.getActivePotionEffect(effect.getPotion());
+                        if(effectPrev != null) {
+                            if(eff.getValue().getAdditiveDuration()) {
+                                duration = eff.getValue().getMaxDuration() >= 0 ? Math.min(duration + effectPrev.getDuration(), eff.getValue().getMaxDuration()) : duration + effectPrev.getDuration();
+                            }
+                            if(eff.getValue().getAdditiveAmplifier()) {
+                                amplifier = eff.getValue().getMaxAmplifier() >= 0 ? Math.min(1 + amplifier + effectPrev.getAmplifier(), eff.getValue().getMaxAmplifier()) : 1 + amplifier + effectPrev.getAmplifier();
+                            }
+                        }
+                    }
+                    player.addPotionEffect(new PotionEffect(effect.getPotion(), duration, amplifier, effect.getIsAmbient(), effect.doesShowParticles()));
+                }
             }
         }
         for(Map.Entry<PotionEffect, Float> cure : effectEntry.getCureEffectMap().entrySet()) {
