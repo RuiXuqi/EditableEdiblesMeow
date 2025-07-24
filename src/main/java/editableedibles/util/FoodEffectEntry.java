@@ -1,12 +1,18 @@
 package editableedibles.util;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.potion.PotionEffect;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class FoodEffectEntry {
 
-    private final Object2ObjectOpenHashMap<PotionEffect, EffectEntry> effectMap = new Object2ObjectOpenHashMap<>();
+    private final List<EffectEntry> chanceEffectList = new ArrayList<>();
+    private final List<EffectEntry> weightEffectList = new ArrayList<>();
+    private float totalWeight = 0;
     private final Object2FloatOpenHashMap<PotionEffect> cureEffectMap = new Object2FloatOpenHashMap<>();
     private final Object2FloatOpenHashMap<CureType> cureTypeMap = new Object2FloatOpenHashMap<>();
     private boolean cancelsDefault = false;
@@ -18,8 +24,19 @@ public class FoodEffectEntry {
     //MistyWorlds compat
     private Pair<Integer, Float> pollutionPair = null;
 
-    public Object2ObjectOpenHashMap<PotionEffect, EffectEntry> getEffectMap() {
-        return this.effectMap;
+    public List<EffectEntry> getChanceEffectList() {
+        return this.chanceEffectList;
+    }
+    
+    @Nullable
+    public EffectEntry getWeightedEffectChoice(Random rand) {
+        float target = this.totalWeight * rand.nextFloat();
+        float current = 0.0F;
+        for(EffectEntry entry : this.weightEffectList) {
+            current += entry.getChance();
+            if(current >= target) return entry;
+        }
+        return null;
     }
 
     public Object2FloatOpenHashMap<PotionEffect> getCureEffectMap() {
@@ -49,7 +66,13 @@ public class FoodEffectEntry {
     }
 
     public void addEffect(PotionEffect effect, float chance, boolean additiveDuration, int maxDuration, boolean additiveAmplifier, int maxAmplifier) {
-        if(effect != null) this.effectMap.put(effect, new EffectEntry(Math.max(0.0F, Math.min(1.0F, chance)), additiveDuration, maxDuration, additiveAmplifier, maxAmplifier));
+        if(effect != null) {
+            if(chance <= 1.0) this.chanceEffectList.add(new EffectEntry(effect, Math.max(0.0F, Math.min(1.0F, chance)), additiveDuration, maxDuration, additiveAmplifier, maxAmplifier));
+            else {
+                this.weightEffectList.add(new EffectEntry(effect, chance, additiveDuration, maxDuration, additiveAmplifier, maxAmplifier));
+                this.totalWeight += chance;
+            }
+        }
     }
 
     public void addCureEffect(PotionEffect effect, float chance) {
@@ -86,18 +109,24 @@ public class FoodEffectEntry {
     
     public static class EffectEntry {
         
+        private final PotionEffect effect;
         private final float chance;
         private final boolean additiveDuration;
         private final int maxDuration;
         private final boolean additiveAmplifier;
         private final int maxAmplifier;
         
-        public EffectEntry(float chance, boolean additiveDuration, int maxDuration, boolean additiveAmplifier, int maxAmplifier) {
+        public EffectEntry(PotionEffect effect, float chance, boolean additiveDuration, int maxDuration, boolean additiveAmplifier, int maxAmplifier) {
+            this.effect = effect;
             this.chance = chance;
             this.additiveDuration = additiveDuration;
             this.maxDuration = maxDuration;
             this.additiveAmplifier = additiveAmplifier;
             this.maxAmplifier = maxAmplifier;
+        }
+        
+        public PotionEffect getEffect() {
+            return this.effect;
         }
         
         public float getChance() {

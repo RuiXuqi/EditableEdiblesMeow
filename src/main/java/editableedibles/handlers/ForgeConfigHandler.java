@@ -34,6 +34,7 @@ public class ForgeConfigHandler {
 		@Config.Comment(
 				"List of food items with their effects and chance to be applied when eaten \n" +
 				"Format: String itemid, Int metadata (-1 for any), String potionid, Int duration, Int amplifier, Boolean showparticles, Float chance \n" +
+				"If chance is above 1.0 it is a weighted choice against other weighted effects (Note: weighted effects for any metadata and specific metadata are considered separate)" + "\n" +
 				"Optional Additional Args, allows for modifying application rules of custom effects: Boolean additiveDuration, Int maxDuration (-1 for any), Boolean additiveAmplifier, Int maxAmplifier (-1 for any)\n" +
 				"Example: minecraft:chicken, -1, minecraft:hunger, 120, 0, false, 0.25 \n" +
 				"Example (Additional): minecraft:steak, -1, minecraft:strength, 30, 0, false, 1.0, true, 120, false, -1")
