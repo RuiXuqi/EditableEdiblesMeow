@@ -62,6 +62,9 @@ repositories {
     maven {
         url = 'https://repo.spongepowered.org/maven'
     }
+    maven {
+        url = 'https://maven.cleanroommc.com'
+    }
     flatDir {
         dirs 'libs\\'
     }
@@ -72,10 +75,13 @@ dependencies {
 
     implementation "org.spongepowered:mixin:0.8.5"
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
-    implementation "io.github.llamalad7:mixinextras-common:0.3.6"
-    annotationProcessor "io.github.llamalad7:mixinextras-common:0.3.6"
 
-    implementation fg.deobf("curse.maven:fermiumbooter-${fermiumbooter_version}")
+    implementation ("zone.rong:mixinbooter:10.6") {
+        transitive = false
+    }
+    annotationProcessor ("zone.rong:mixinbooter:10.6") {
+        transitive = false
+    }
 
     implementation fg.deobf("curse.maven:foodexpansion-${foodexpansion_version}")
 
@@ -93,7 +99,8 @@ processResources {
     filesMatching('mcmod.info') {
         expand 'mod_id': mod_id, 'mod_name': mod_name, 'version': project.version,
                 'mcversion': minecraft_version, 'mod_description': mod_description,
-                'mod_author': mod_author
+                'mod_author': mod_author,
+                'mod_url': mod_url
     }
 }
 
